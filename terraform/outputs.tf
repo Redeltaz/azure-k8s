@@ -5,7 +5,7 @@ output "public_ip" {
 }
 
 resource "local_file" "kubeconfig" {
-  depends_on   = [azurerm_kubernetes_cluster.kubernetes_cluster]
-  filename     = "../kubeconfig"
-  content      = azurerm_kubernetes_cluster.kubernetes_cluster.kube_config_raw
+  depends_on = [azurerm_kubernetes_cluster.kubernetes_cluster]
+  filename   = "../kubernetes/kubeconfig"
+  content    = azurerm_kubernetes_cluster.kubernetes_cluster.kube_config_raw
 }

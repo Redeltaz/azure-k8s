@@ -5,6 +5,16 @@ resource "azurerm_resource_group" "resource_group" {
   tags = var.default_tags
 }
 
+resource "azurerm_public_ip" "public_ip" {
+  name                = "${var.project_name}-public-ip"
+  resource_group_name = azurerm_kubernetes_cluster.kubernetes_cluster.node_resource_group
+  location            = var.region
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = var.default_tags
+}
+
 resource "azurerm_container_registry" "container_registry" {
   # CR does not accept alphanumeric characters
   name = "cr${replace(var.project_name, "-", "")}"
@@ -23,9 +33,10 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   dns_prefix          = "devops"
 
   default_node_pool {
-    name       = "default"
-    vm_size    = "Standard_B2s"
-    node_count = 1
+    name                  = "default"
+    vm_size               = "Standard_B2s"
+    node_count            = 1
+    enable_node_public_ip = false
   }
 
   identity {
@@ -36,23 +47,13 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
 }
 
 resource "azurerm_role_assignment" "acr_pull_role" {
-  principal_id                     = azurerm_kubernetes_cluster.kubernetes_cluster.kubelet_identity[0].object_id
-  role_definition_name             = "AcrPull"
-  scope                            = azurerm_container_registry.container_registry.id
-}
-
-resource "azurerm_role_assignment" "acr_push_role" {
-  principal_id         = data.azuread_client_config.current_user.object_id
-  role_definition_name = "AcrPush"
+  principal_id         = azurerm_kubernetes_cluster.kubernetes_cluster.kubelet_identity[0].object_id
+  role_definition_name = "AcrPull"
   scope                = azurerm_container_registry.container_registry.id
 }
 
-resource "azurerm_public_ip" "public_ip" {
-  name                    = "${var.project_name}-public-ip"
-  resource_group_name     = azurerm_resource_group.resource_group.name
-  location                = var.region
-  allocation_method       = "Dynamic"
-  idle_timeout_in_minutes = 30
-
-  tags = var.default_tags
+resource "azurerm_role_assignment" "acr_push_role" {
+  principal_id         = data.azurerm_client_config.current_user.object_id
+  role_definition_name = "AcrPush"
+  scope                = azurerm_container_registry.container_registry.id
 }
