@@ -32,7 +32,7 @@ terraform -chdir=terraform init
 
 And then apply to Azure :
 ```bash
-terraform -chdir=terraform apply
+terraform -chdir=terraform apply --auto-approve
 ```
 
 Terraform will output the public ip address of the cluster, the kubeconfig file, the name and url of the container registry, we'll use it later.
@@ -99,7 +99,8 @@ helm install ingress-nginx ingress-nginx/ingress-nginx \
     --set controller.service.loadBalancerIP=$AKS_PUBLIC_IP
 ```
 
-Everything is now fully deployed, you can test if everything work by using `curl $AKS_PUBLIC_IP` multiple times, the counter should increase
+Everything is now fully deployed, you can test if everything work by using `curl $AKS_PUBLIC_IP` multiple times, the counter should increase.
+It may not work instantly, maybe you will have to wait some seconds before it work.
 
 <a name="4-destroy-the-project"></a>
 ## 4. Destroy the project
@@ -118,5 +119,5 @@ helm uninstall ingress-nginx --kubeconfig kubernetes/kubeconfig
 
 Destroy all azure resources :
 ```bash
-terraform -chdir=terraform destroy
+terraform -chdir=terraform destroy --auto-approve
 ```
