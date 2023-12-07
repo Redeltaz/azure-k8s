@@ -13,7 +13,7 @@ When the project is pulled you can follow all this steps :
 3. [Deploy the application](#3-deploy-the-application)
 4. [Destroy the project](#4-destroy-the-project)
 
-All the commands need to be executed on the route of the directory
+All the commands need to be executed on the root of the directory
 
 <a name="1-deploy-the-infrastructure"></a>
 ## 1. Deploy the infrastructure
